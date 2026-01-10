@@ -1,0 +1,26 @@
+# 日志系统
+用单例模板创建一个全局唯一的loggermanager。确保唯一性。
+# 配置系统
+约定>配置。做好初始值，用配置覆盖初始值。
+回调函数通知变化情况。哪些改动。
+static ConfigVarMap &GetDatas()
+        {
+            static ConfigVarMap s_datas;// 静态，这样可以在类之前初始化
+            return s_datas;
+        }
+设置静态get方法，并且定义静态类，可以确保在类创建之前初始化静态变量。防止内存段错误
+变更回调函数组, uint64_t key,要求唯一，一般可以用hash。设置为map是因为functional没有比较函数，放到vector里面不好删除
+std::map<uint64_t, on_change_cb> m_cbs;
+把callback的key作为static，这样避免key冲突
+
+# 线程
+线程需要加锁。pthread_create会调用Thread::run, 确保Thread::run中初始化步骤执行完毕。
+thread_local确保每个线程保有一份不一样数据。
+禁止拷贝构造和移动构造赋值。
+锁(Semaphore)
+**封装和RAII**：便于用户使用，而且可以自动管理锁的生命周期。例如把读锁定义在{}中，出了这个{}自动析构函数释放信号。
+范围锁是指用类的构造函数来加锁，用析造函数来释放锁。这种方式可以简化锁的操作，也可以避免忘记解锁导致的死锁问题
+
+类内设置静态函数，方便访问一些变量
+
+自旋锁和互斥锁：一个是忙等，一个是阻塞。前者减少系统调用，适合冲突少的场景。

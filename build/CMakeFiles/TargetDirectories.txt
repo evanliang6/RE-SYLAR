@@ -1,0 +1,6 @@
+/home/liangyifan/Desktop/cpp/myServer/build/CMakeFiles/sylar.dir
+/home/liangyifan/Desktop/cpp/myServer/build/CMakeFiles/test.dir
+/home/liangyifan/Desktop/cpp/myServer/build/CMakeFiles/test_config.dir
+/home/liangyifan/Desktop/cpp/myServer/build/CMakeFiles/test_thread.dir
+/home/liangyifan/Desktop/cpp/myServer/build/CMakeFiles/edit_cache.dir
+/home/liangyifan/Desktop/cpp/myServer/build/CMakeFiles/rebuild_cache.dir
