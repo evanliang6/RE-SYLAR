@@ -6,7 +6,7 @@ namespace sylar
     std::atomic<uint64_t> s_fiber_id{0};// 全局协程ID
     std::atomic<uint64_t> s_fiber_count{0};// 全局协程数量
 
-    static thread_local Fiber* t_fiber=nullptr;
+    static thread_local Fiber* t_fiber=nullptr; // 当前正在执行的协程
     static thread_local std::shared_ptr<Fiber> t_threadFiber=nullptr;// MASTER协程
     static ConfigVar<uint32_t>::ptr g_fiber_stack_size=Config::Lookup<uint32_t>("fiber.stack_size",128*1024,"fiber stack size");
 
@@ -48,6 +48,7 @@ namespace sylar
         m_ctx.uc_stack.ss_size = m_stacksize;
 
         makecontext(&m_ctx, &Fiber::MainFunc, 0);// 设置协程入口函数
+        m_state = INIT;
     
     }
     Fiber::~Fiber(){
@@ -142,6 +143,7 @@ namespace sylar
         }
 
         Fiber::ptr temp = cur;
+        cur.reset();// 释放当前协程智能指针，防止swapOut切换回来时引用计数不为0而无法销毁
         temp->swapOut();
 
         SYLAR_ASSERT2(false,"Fiber MainFunc never reach here");

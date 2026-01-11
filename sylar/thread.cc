@@ -45,9 +45,6 @@ const std::string& Thread::GetName() {
 }
 
 void Thread::SetName(const std::string& name) {
-    if(name.empty()) {
-        return;
-    }
     if(t_thread) {
         t_thread->m_name = name;
     }
@@ -55,7 +52,8 @@ void Thread::SetName(const std::string& name) {
 }
 
 Thread::Thread(std::function<void()> cb, const std::string& name){
-    if(name.empty()){
+    m_name=name;
+    if(name.empty()) {
         m_name = "UNKNOW";
     }
     m_cb=cb;
@@ -71,8 +69,10 @@ Thread::Thread(std::function<void()> cb, const std::string& name){
 void* Thread::run(void* arg){
     Thread* thread = (Thread*)arg;
     t_thread = thread;// 设置当前线程指针
+    t_thread_name = thread->m_name;
     thread->m_id = sylar::GetThreadId();// 设置线程id
     pthread_setname_np(pthread_self(), thread->m_name.substr(0,15).c_str());// 设置线程名称，linux限制16字节，包括结束符
+    t_thread_name = thread->m_name; 
     std::function<void()> cb;
     cb.swap(thread->m_cb);// 交换函数对象，避免拷贝
     thread->m_semaphore.notify();// 通知线程创建成功
