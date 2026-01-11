@@ -145,5 +145,14 @@ namespace sylar
         temp->swapOut();
 
         SYLAR_ASSERT2(false,"Fiber MainFunc never reach here");
-    }    
+    }
+
+    uint64_t Fiber::GetFiberId() {
+        if(t_fiber){
+            return t_fiber->getId();
+        }
+        return 0;
+
+    }
+
 }

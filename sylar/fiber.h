@@ -26,6 +26,7 @@ public:
     void reset(std::function<void()> cb);
     void swapIn();// 切换到当前协程执行. 用于调度协程
     void swapOut();
+    uint64_t getId() const { return m_id; }
 
     static Fiber::ptr GetThis();// 获取当前协程指针
     static void SetThis(Fiber* f);// 设置当前协程指针
@@ -34,6 +35,7 @@ public:
 
     static uint64_t TotalFibers();// 获取协程总数
     static void MainFunc();// 协程执行函数入口
+    static uint64_t GetFiberId();// 获取当前协程id
 
 private:
     Fiber();

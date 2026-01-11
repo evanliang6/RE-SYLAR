@@ -1,4 +1,3 @@
-node.mkd
 # ===== CMake build artifacts =====
 build/
 CMakeCache.txt
