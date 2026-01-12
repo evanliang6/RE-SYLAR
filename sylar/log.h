@@ -12,7 +12,7 @@
 #include <map>
 #include "util.h"
 #include "singleton.h"
-#include"thread.h"
+#include "thread.h"
 
 #define SYLAR_LOG_LEVEL(logger, level) \
     if(logger->getLevel() <= level) \
@@ -68,8 +68,8 @@ public:
     typedef std::shared_ptr<LogEvent> ptr;
     LogEvent(std::shared_ptr<Logger> logger, LogLevel::Level level
             ,const char* file, int32_t m_line, uint32_t elapse
-            , uint32_t thread_id, uint32_t fiber_id, uint64_t time,
-            const std::string& thread_name = "");
+            ,uint32_t thread_id, uint32_t fiber_id, uint64_t time
+            ,const std::string& thread_name);
 
     const char* getFile() const { return m_file;}
     int32_t getLine() const { return m_line;}
@@ -77,9 +77,9 @@ public:
     uint32_t getThreadId() const { return m_threadId;}
     uint32_t getFiberId() const { return m_fiberId;}
     uint64_t getTime() const { return m_time;}
+    const std::string& getThreadName() const { return m_threadName;}
     std::string getContent() const { return m_ss.str();}
     std::shared_ptr<Logger> getLogger() const { return m_logger;}
-    std::string getThreadName() const { return m_threadName;}
     LogLevel::Level getLevel() const { return m_level;}
 
     std::stringstream& getSS() { return m_ss;}
@@ -94,6 +94,7 @@ private:
     uint64_t m_time = 0;           //时间戳
     std::string m_threadName;
     std::stringstream m_ss;
+
     std::shared_ptr<Logger> m_logger;
     LogLevel::Level m_level;
 };
@@ -140,7 +141,7 @@ class LogAppender {
 friend class Logger;
 public:
     typedef std::shared_ptr<LogAppender> ptr;
-    typedef Mutex MutexType;
+    typedef Spinlock MutexType;
     virtual ~LogAppender() {}
 
     virtual void log(std::shared_ptr<Logger> logger, LogLevel::Level level, LogEvent::ptr event) = 0;
@@ -154,8 +155,8 @@ public:
 protected:
     LogLevel::Level m_level = LogLevel::DEBUG;
     bool m_hasFormatter = false;
-    LogFormatter::ptr m_formatter;
     MutexType m_mutex;
+    LogFormatter::ptr m_formatter;
 };
 
 //日志器
@@ -163,6 +164,7 @@ class Logger : public std::enable_shared_from_this<Logger> {
 friend class LoggerManager;
 public:
     typedef std::shared_ptr<Logger> ptr;
+    typedef Spinlock MutexType;
 
     Logger(const std::string& name = "root");
     void log(LogLevel::Level level, LogEvent::ptr event);
@@ -189,10 +191,10 @@ public:
 private:
     std::string m_name;                     //日志名称
     LogLevel::Level m_level;                //日志级别
+    MutexType m_mutex;
     std::list<LogAppender::ptr> m_appenders;//Appender集合
     LogFormatter::ptr m_formatter;
-    Logger::ptr m_root;// 根日志器
-    sylar::Mutex m_mutex;
+    Logger::ptr m_root;
 };
 
 //输出到控制台的Appender
@@ -216,11 +218,12 @@ public:
 private:
     std::string m_filename;
     std::ofstream m_filestream;
-    uint64_t m_lastTime = 0;// 过一段时间reopen, 防止文件被删除等情况
+    uint64_t m_lastTime = 0;
 };
 
 class LoggerManager {
 public:
+    typedef Spinlock MutexType;
     LoggerManager();
     Logger::ptr getLogger(const std::string& name);
 
@@ -229,7 +232,7 @@ public:
 
     std::string toYamlString();
 private:
-    Mutex m_mutex;
+    MutexType m_mutex;
     std::map<std::string, Logger::ptr> m_loggers;
     Logger::ptr m_root;
 };

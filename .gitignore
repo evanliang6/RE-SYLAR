@@ -26,8 +26,6 @@ lib/
 *.exe
 *.out
 *.app
-test
-test_*
 a.out
 
 # ===== Debug & profile =====
