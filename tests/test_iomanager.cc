@@ -27,7 +27,7 @@ void test_fiber() {
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_port = htons(80);
-    inet_pton(AF_INET, "192.168.1.2", &addr.sin_addr.s_addr);
+    inet_pton(AF_INET, "115.239.210.27", &addr.sin_addr.s_addr);
 
     if(!connect(sock, (const sockaddr*)&addr, sizeof(addr))) {
     } else if(errno == EINPROGRESS) {
@@ -54,7 +54,21 @@ void test1() {
     iom.schedule(&test_fiber);
 }
 
+sylar::Timer::ptr s_timer;
+void test_timer() {
+    sylar::IOManager iom(2);
+    s_timer = iom.addTimer(1000, [](){
+        static int i = 0;
+        SYLAR_LOG_INFO(g_logger) << "hello timer i=" << i;
+        if(++i == 3) {
+            s_timer->reset(2000, true);
+            //s_timer->cancel();
+        }
+    }, true);
+}
+
 int main(int argc, char** argv) {
-    test1();
+    //test1();
+    test_timer();
     return 0;
 }

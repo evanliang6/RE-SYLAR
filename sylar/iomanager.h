@@ -2,10 +2,11 @@
 #define __SYLAR_IOMANAGER_H__
 
 #include "scheduler.h"
+#include "timer.h"
 
 namespace sylar {
 
-class IOManager : public Scheduler {
+class IOManager : public Scheduler , public TimerManager {
 public:
     typedef std::shared_ptr<IOManager> ptr;
     typedef RWMutex RWMutexType;
@@ -52,8 +53,10 @@ protected:
     void tickle() override;
     bool stopping() override;
     void idle() override;
+    void onTimerInsertedAtFront() override;// 当有新的定时器插入到最前面时触发
 
     void contextResize(size_t size);// 如果不预先分配，注册事件时需要频繁的加锁和扩容vector
+    bool stopping(uint64_t& timeout);
 private:
     int m_epfd = 0;// epoll的文件描述符
     int m_tickleFds[2];
