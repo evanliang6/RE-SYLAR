@@ -31,7 +31,7 @@ void test_sock() {
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_port = htons(80);
-    inet_pton(AF_INET, "115.239.210.27", &addr.sin_addr.s_addr);
+    inet_pton(AF_INET, "45.113.192.101", &addr.sin_addr.s_addr);
 
     SYLAR_LOG_INFO(g_logger) << "begin connect";
     int rt = connect(sock, (const sockaddr*)&addr, sizeof(addr));
@@ -41,7 +41,11 @@ void test_sock() {
         return;
     }
 
-    const char data[] = "GET / HTTP/1.0\r\n\r\n";
+    const char data[] =
+    "GET / HTTP/1.1\r\n"
+    "Host: www.baidu.com\r\n"
+    "Connection: close\r\n"
+    "\r\n";
     rt = send(sock, data, sizeof(data), 0);
     SYLAR_LOG_INFO(g_logger) << "send rt=" << rt << " errno=" << errno;
 

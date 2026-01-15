@@ -100,6 +100,7 @@ static ssize_t do_io(int fd, OriginFun fun, const char* hook_fun_name,
     }
 
     // 如果用户希望阻塞，则需要我们自己实现超时逻辑。但是在系统层面，仍然是非阻塞的
+    SYLAR_LOG_DEBUG(g_logger) << "do_io<" << hook_fun_name << ">";
 
     uint64_t to = ctx->getTimeout(timeout_so);
     std::shared_ptr<timer_info> tinfo(new timer_info);
