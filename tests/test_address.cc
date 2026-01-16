@@ -7,7 +7,8 @@ void test() {
     std::vector<sylar::Address::ptr> addrs;
 
     SYLAR_LOG_INFO(g_logger) << "begin";
-    bool v = sylar::Address::Lookup(addrs, "www.sylar.top");
+    bool v = sylar::Address::Lookup(addrs, "www.baidu.com",AF_INET,SOCK_STREAM,IPPROTO_TCP);
+    
     SYLAR_LOG_INFO(g_logger) << "end";
     if(!v) {
         SYLAR_LOG_ERROR(g_logger) << "lookup fail";
@@ -79,7 +80,7 @@ void test_broadcast(){
 int main(int argc, char** argv) {
     //test_ipv4();
     //test_iface();
-    //test();
-    test_broadcast();
+    test();
+    //test_broadcast();
     return 0;
 }

@@ -65,4 +65,19 @@ c++ 可变参数
 # socket
 为什么普通 socket 教程从来不讲网卡？因为调用connect等函数的时候，系统让所有网卡监听并且帮你选择网卡。而sylar我们自己枚举和选择。
 
+likely宏优化加速
+用了 __builtin_expect编译器会：
+把 “不失败路径” 放在 指令连续、cache 友好 的位置
+把 失败路径 放到冷分支（cold path）
+减少：分支预测失败,pipeline flush指令,cache miss
+
+family 决定的是 sockaddr 的结构类型。是ipv4还是ipv6. type决定是TCP还是UDP, protocol是type实现的协议。
+void* + len 是“一次连续内存读写”，
+iovec 是“一次系统调用，读写多块不连续内存”。
+iovec 的存在是为了 减少拷贝、减少系统调用、提高 I/O 性能。
+如果数据是分散的，想要发送void*必须要用c语言字符串拼接，再发送。占用额外空间而且耗时。但是iovec不需要拼接，直接发送直接接收。
+
+accept: 返回一个新的fd用于通信。这样可以实现有一个fd专门用于监听连接，其余fd用于通信。
+
+SO_REUSEADDR: 一般来说，一个端口释放后会等待两分钟之后才能再被使用(防止旧连接的报文污染)，SO_REUSEADDR是让端口释放后立即就可以被再次使用。
 
