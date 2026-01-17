@@ -46,7 +46,7 @@ namespace sylar
         int64_t getRecvTimeout();
         void setRecvTimeout(int64_t v);
 
-        bool getOption(int level, int option, void *result, socklen_t *len);
+        bool getOption(int level, int option, void *result, size_t *len);
         template <class T>
         bool getOption(int level, int option, T &result)
         {
@@ -54,7 +54,7 @@ namespace sylar
             return getOption(level, option, &result, &length);
         }
 
-        bool setOption(int level, int option, const void *result, socklen_t len);
+        bool setOption(int level, int option, const void *result, size_t len);
         template <class T>
         bool setOption(int level, int option, const T &value)
         {

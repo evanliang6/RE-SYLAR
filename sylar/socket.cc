@@ -95,7 +95,7 @@ void Socket::setRecvTimeout(int64_t v)
     setOption(SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 }
 
-bool Socket::setOption(int level, int option, const void* result, socklen_t len)
+bool Socket::setOption(int level, int option, const void* result, size_t len)
 {
     int rt = setsockopt(m_sock,level,option,result,len);
     if(rt){
@@ -107,7 +107,7 @@ bool Socket::setOption(int level, int option, const void* result, socklen_t len)
     return true;
 }
 
-bool Socket::getOption(int level, int option, void* result, socklen_t* len)
+bool Socket::getOption(int level, int option, void* result, size_t* len)
 {
     int rt = getsockopt(m_sock,level,option,result,(socklen_t*)len);
     if(rt){
@@ -390,7 +390,7 @@ Address::ptr Socket::getLocalAddress() {
 
 int Socket::getError() {
     int error = 0;
-    socklen_t len = sizeof(error);
+    size_t len = sizeof(error);
     if(!getOption(SOL_SOCKET, SO_ERROR, &error, &len)) {
         return -1;
     }
