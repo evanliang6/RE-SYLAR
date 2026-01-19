@@ -449,5 +449,8 @@ void Socket::newSock() {
             << errno << " errstr=" << strerror(errno);
     }
 }
+std::ostream& operator<<(std::ostream& os, const Socket& sock) {
+    return sock.dump(os);
+}
 
 }
