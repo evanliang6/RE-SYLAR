@@ -19,34 +19,36 @@ HttpRequest::ptr HttpSession::recvRequest(){
     do {
         int len = read(data + offset, buff_size - offset);// 从socket流中读取数据到data缓冲区.如果长度小于缓冲区大小,则继续读取
         if(len <= 0) {
+            close();
             return nullptr;
         }
         len += offset;// 加上上一次剩的
         size_t nparse = parser->execute(data, len);// nparse表示已经解析的字节数
         if(parser->hasError()) {
+            close();
             return nullptr;
         }
         offset = len - nparse;// 剩余字节数
         if(offset == (int)buff_size) {
+            close();
             return nullptr;
         }
         if(parser->isFinished()) {
             break;
         }
     } while(true);
-    int64_t length = parser->getContentLength();
-    if(length > 0) {
+    int64_t content_length = parser->getContentLength();
+    if (content_length > 0) {
         std::string body;
-        body.reserve(length);
+        body.resize(content_length);
 
-        if(length >= offset) {
-            body.append(data, offset);
-        } else {
-            body.append(data, length);
-        }
-        length -= offset;
-        if(length > 0) {
-            if(readFixSize(&body[body.size()], length) <= 0) {
+        int copied = std::min((int64_t)offset, content_length);
+        memcpy(&body[0], data, copied);
+
+        int64_t remain = content_length - copied;
+        if (remain > 0) {
+            if (readFixSize(&body[copied], remain) <= 0) {
+                close();
                 return nullptr;
             }
         }
