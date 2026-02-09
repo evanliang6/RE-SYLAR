@@ -305,7 +305,9 @@ public:
 private:
     static void ReleasePtr(HttpConnection* ptr, HttpConnectionPool* pool);
 private:
+    /// 主机地址
     std::string m_host;
+    /// 虚拟主机地址
     std::string m_vhost;
     uint32_t m_port;
     uint32_t m_maxSize;

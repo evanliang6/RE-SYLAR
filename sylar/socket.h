@@ -16,7 +16,7 @@ namespace sylar
     public:
         typedef std::shared_ptr<Socket> ptr;
         typedef std::weak_ptr<Socket> weak_ptr;
-
+        
         enum Type
         {
             TCP = SOCK_STREAM,

@@ -8,7 +8,7 @@ namespace sylar {
 static sylar::Logger::ptr g_logger = SYLAR_LOG_NAME("system");
 
 static thread_local Scheduler* t_scheduler = nullptr;
-static thread_local Fiber* t_scheduler_fiber = nullptr;// 当前调度器正在执行的协程
+static thread_local Fiber* t_scheduler_fiber = nullptr;// 当前线程正在scheduler::run运行的协程
 
 Scheduler::Scheduler(size_t threads, bool use_caller, const std::string& name)
     :m_name(name) {
@@ -64,11 +64,6 @@ void Scheduler::start() {
     }
     lock.unlock();
 
-    // if(m_rootFiber) {
-    //     //m_rootFiber->swapIn();
-    //     m_rootFiber->call();
-    //     SYLAR_LOG_INFO(g_logger) << "call out " << m_rootFiber->getState();
-    // }
 }
 
 void Scheduler::stop() {
@@ -173,7 +168,7 @@ void Scheduler::run() {
             ft.fiber->swapIn();// 执行这个协程
             --m_activeThreadCount;
 
-            if(ft.fiber->getState() == Fiber::READY) {// 执行完后是READY状态，继续加入调度
+            if(ft.fiber->getState() == Fiber::READY ) {// 执行完后是READY状态，继续加入调度
                 schedule(ft.fiber);
             } else if(ft.fiber->getState() != Fiber::TERM
                     && ft.fiber->getState() != Fiber::EXCEPT) {
@@ -210,9 +205,9 @@ void Scheduler::run() {
                 SYLAR_LOG_INFO(g_logger) << "idle fiber term";
                 break;
             }
-
+            // 执行idle
             ++m_idleThreadCount;
-            idle_fiber->swapIn();
+            idle_fiber->swapIn();// 切换到idle，防止忙等待任务
             --m_idleThreadCount;
             if(idle_fiber->getState() != Fiber::TERM
                     && idle_fiber->getState() != Fiber::EXCEPT) {

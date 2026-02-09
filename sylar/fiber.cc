@@ -155,7 +155,7 @@ namespace sylar
         SetThis(this);
         SYLAR_ASSERT(m_state != EXEC);
         m_state = EXEC;
-        if (swapcontext(&Scheduler::GetMainFiber()->m_ctx, &m_ctx))
+        if (swapcontext(&Scheduler::GetMainFiber()->m_ctx, &m_ctx))// 获取调度协程的上下文，切换到当前协程
         {
             SYLAR_ASSERT2(false, "swapcontext");
         }
@@ -204,7 +204,7 @@ namespace sylar
     {
         Fiber::ptr cur = GetThis();
         SYLAR_ASSERT(cur->m_state == EXEC);
-        cur->m_state = HOLD;
+        //cur->m_state = HOLD;
         cur->swapOut();
     }
 

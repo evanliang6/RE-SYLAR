@@ -19,6 +19,9 @@ Socket::ptr Socket::CreateTCP(sylar::Address::ptr address) {
 
 Socket::ptr Socket::CreateUDP(sylar::Address::ptr address) {
     Socket::ptr sock(new Socket(address->getFamily(), UDP, 0));
+    // TCP是在connect的时候创建socket的，而UDP在创建时就需要创建socket
+    sock->newSock();
+    sock->m_isConnected = true;
     return sock;
 }
 
@@ -29,6 +32,8 @@ Socket::ptr Socket::CreateTCPSocket() {
 
 Socket::ptr Socket::CreateUDPSocket() {
     Socket::ptr sock(new Socket(IPv4, UDP, 0));
+    sock->newSock();
+    sock->m_isConnected = true;
     return sock;
 }
 
@@ -39,6 +44,8 @@ Socket::ptr Socket::CreateTCPSocket6() {
 
 Socket::ptr Socket::CreateUDPSocket6() {
     Socket::ptr sock(new Socket(IPv6, UDP, 0));
+    sock->newSock();
+    sock->m_isConnected = true;
     return sock;
 }
 
@@ -134,7 +141,7 @@ Socket::ptr Socket::accept()
 
 bool Socket::init(int sock)
 {
-    FdCtx::ptr ctx= FdMgr::GetInstance()->get(sock);
+    FdCtx::ptr ctx= FdMgr::GetInstance()->get(sock); 
     if(ctx&&ctx->isSocket()&&!ctx->isClose()){
         m_sock=sock;
         m_isConnected=true;
@@ -257,6 +264,9 @@ int Socket::send(const iovec* buffers, size_t length, int flags)
 int Socket::sendTo(const void* buffer, size_t length, const Address::ptr to, int flags)
 {
     if(isConnected()){
+        // 打印发送信息
+        //std::cout<< "sendTo: " << std::string((const char*)buffer, length)
+         //        << " to: " << to->toString() << std::endl;
         return ::sendto(m_sock,buffer,length,flags,
             to->getAddr(),to->getAddrLen());
     }

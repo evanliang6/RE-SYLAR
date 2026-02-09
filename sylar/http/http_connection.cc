@@ -281,14 +281,14 @@ HttpConnection::ptr HttpConnectionPool::getConnection() {
     std::vector<HttpConnection*> invalid_conns;
     HttpConnection* ptr = nullptr;
     MutexType::Lock lock(m_mutex);
-    while(!m_conns.empty()) {
+    while(!m_conns.empty()) {// 连接池不为空
         auto conn = *m_conns.begin();
         m_conns.pop_front();
-        if(!conn->isConnected()) {
+        if(!conn->isConnected()) {// 如果连接不可用或者超时要放入删除列表并且重新获取一个
             invalid_conns.push_back(conn);
             continue;
         }
-        if((conn->m_createTime + m_maxAliveTime) > now_ms) {
+        if((conn->m_createTime + m_maxAliveTime) < now_ms) {
             invalid_conns.push_back(conn);
             continue;
         }

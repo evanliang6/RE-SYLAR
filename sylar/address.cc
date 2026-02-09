@@ -362,7 +362,8 @@ uint32_t IPv4Address::getPort() const {
 }
 
 void IPv4Address::setPort(uint32_t v) {
-    m_addr.sin_port = byteswapOnLittleEndian(v);
+    //m_addr.sin_port = byteswapOnLittleEndian(v);
+    m_addr.sin_port = htons(v);
 }
 
 IPv6Address::ptr IPv6Address::Create(const char* address, uint16_t port) {

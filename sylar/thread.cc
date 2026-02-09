@@ -53,7 +53,7 @@ Thread::Thread(std::function<void()> cb, const std::string& name)
     if(name.empty()) {
         m_name = "UNKNOW";
     }
-    int rt = pthread_create(&m_thread, nullptr, &Thread::run, this);
+    int rt = pthread_create(&m_thread, nullptr, &Thread::run, this);// 非阻塞
     if(rt) {
         SYLAR_LOG_ERROR(g_logger) << "pthread_create thread fail, rt=" << rt
             << " name=" << name;
@@ -68,7 +68,7 @@ Thread::~Thread() {
     }
 }
 
-void Thread::join() {
+void Thread::join() {// 阻塞等待线程执行完毕
     if(m_thread) {
         int rt = pthread_join(m_thread, nullptr);
         if(rt) {
