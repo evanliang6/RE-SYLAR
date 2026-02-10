@@ -128,7 +128,7 @@ retry:
         }
 
         int rt = iom->addEvent(fd, (sylar::IOManager::Event)(event));// 没有设置超时机制，去io多路复用器等待事件就绪
-        if(SYLAR_UNLICKLY(rt)) {
+        if(SYLAR_UNLIKELY(rt)) {
             SYLAR_LOG_ERROR(g_logger) << hook_fun_name << " addEvent("
                 << fd << ", " << event << ")";
             if(timer) {

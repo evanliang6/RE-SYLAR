@@ -319,7 +319,7 @@ public:
     /**
      * @brief 是否有效(m_sock != -1)
      */
-    bool isValid() const;
+    bool isValid() const{return m_sock != -1;}
 
     /**
      * @brief 返回Socket错误
